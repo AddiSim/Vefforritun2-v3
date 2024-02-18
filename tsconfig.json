@@ -8,6 +8,6 @@
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["**/*.ts"],
+  "include": ["**/*.ts", "src/lib/db.js"],
   "exclude": ["node_modules", "**/*.spec.ts"]
 }
