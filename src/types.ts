@@ -14,20 +14,14 @@ export type team = {
     id: number;
     name: string;
     slug: string;
-    description: string;
+    description?: string;
 }
 
 export type game = {
     id: number;
     date: string;
-    homeId: number;
-    awayId: number;
-    home?: string;
-    away?: string;
-    home_score: number;
-    away_score: number;
+    homescore: number;
+    awayscore: number;
+    homename?: string;
+    awayname?: string;
 }
-
-export async function getTeamById(id: number): Promise<team | null>{
-    return null;
-};
