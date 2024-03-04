@@ -38,9 +38,6 @@ export function gamesMapper(potentialGames: unknown): Array<game> {
     if(!games || !Array.isArray(games)) {
         return [];
     }
-
-    console.log('games: >>', games.length);
-
     const mapped = games.map((item) => gameMapper(item)).filter((result): result is game => result !== null);
 
     return mapped;
@@ -75,9 +72,6 @@ export function teamsMapper(potentialTeams: unknown): Array<team> {
     if(!teams || !Array.isArray(teams)) {
         return [];
     }
-
-    console.log('teams: >>', teams.length);
-
     const mapped = teams.map((item) => teamMapper(item)).filter((result): result is team => result !== null);
 
     return mapped;

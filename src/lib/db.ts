@@ -71,12 +71,13 @@ export async function testConnection(): Promise<void> {
 export async function updateTeamSlugs() {
   const teams = await query('SELECT id, name FROM teams');
   if (teams && teams.rows) {
-    teams.rows.forEach(async (team: any) => {
+    for (const team of teams.rows) {
       const slug = slugify(team.name);
-      await query('UPDATE teams SET slug = $1 WHERE id = $2', [slug, team.id]);
-    });
+      await query('UPDATE teams SET slug = LOWER($1) WHERE id = $2', [slug, team.id]);
+    }
   } 
 }
+
 
 export async function insertTeam(team: Omit<team, 'id'>, silent = false): Promise<team | null> {
   const { name, slug, description } = team;
@@ -97,20 +98,17 @@ export async function insertGame(
 ): Promise<game | null> {
   const { date, homename, awayname, homescore, awayscore } = gameData;
   const result = await query(
-    'INSERT INTO games (id, date, home, away, homescore, awayscore) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+    'INSERT INTO games (date, homename, awayname, homescore, awayscore) VALUES ($1, $2, $3, $4, $5) RETURNING *',
     [date, homename, awayname, homescore, awayscore],
     silent,
   );
-
-  if (!result || result.rows.length === 0) return null;
-
-  return gameMapper(result.rows[0]);
+    
+  return result ? gameMapper(result.rows[0]) : null;
 }
 
 export async function getTeams(): Promise<Array<team> | null> {
   try {
     const result = await query('SELECT * FROM teams');
-    console.log(result);
     if (!result || result.rows.length === 0) return null;
     return result.rows.map(teamMapper).filter((t): t is team => t !== null);
   } catch (error) {
@@ -223,55 +221,31 @@ export async function getGames(): Promise<Array<game> | null> {
   return mappedGames;
 }
 
-export async function updateGameByGameId(gameId: number, data: Partial<game>): Promise<game | null> {
-  const updates = Object.entries(data).reduce((acc, [key, value]) => {
-    // Ensure that key is actually a key of game
-    if (value !== undefined && ["date", "homename", "awayname", "homescore", "awayscore"].includes(key)) {
-      acc.fields.push(`${key} = ?`);
-      acc.values.push(value);
-    }
-    return acc;
-  }, { fields: [] as string[], values: [] as (string | number)[] });
+export async function deleteGameByGameId(gameId: number): Promise<boolean> {
+  const result = await query('DELETE FROM games WHERE id = $1 RETURNING *', [gameId]);
+  return (result?.rowCount ?? 0) > 0;
+}
 
-  if (updates.fields.length === 0) {
-    throw new Error('No update fields provided');
+export async function updateGameByGameId(gameId: number, data: Partial<game>): Promise<game | null> {
+  const updates = Object.entries(data).filter(([key, value]) => value !== undefined && ["date", "homename", "awayname", "homescore", "awayscore"].includes(key))
+                      .map(([key], index) => `${key} = $${index + 1}`);
+  if (!updates.length) {
+      throw new Error('No update fields provided');
   }
 
-  const setClause = updates.fields.join(', ');
-  const values = [...updates.values, gameId]; // Add gameId at the end for the WHERE clause
-  const query = `
-    UPDATE games
-    SET ${setClause}
-    WHERE id = $${values.length} // Assuming gameId is the last parameter
-    RETURNING *;
-  `;
+  const values = [...Object.values(data).filter(value => value !== undefined), gameId];
+  const queryText = `UPDATE games SET ${updates.join(', ')} WHERE id = $${values.length} RETURNING *;`;
 
   try {
-    const pool = getPool();
-    const result = await pool.query(query, values);
-    if (result.rows.length === 0) {
-      return null; // No game found with the given ID
-    }
-    return gameMapper(result.rows[0]);
+      const pool = getPool();
+      const result = await pool.query(queryText, values);
+      if (result.rows.length === 0) {
+          return null; // No game found with the given ID
+      }
+      return gameMapper(result.rows[0]);
   } catch (error) {
-    console.error('Failed to update game by ID', error);
-    throw error;
+      console.error('Failed to update game by ID', error);
+      throw error;
   }
 }
 
-export async function changeGameStatusByGameId(gameId: number, status: string): Promise<game | null> {
-  const sqlQuery = `
-    UPDATE games
-    SET status = $2
-    WHERE id = $1
-    RETURNING *;
-  `;
-
-  const values = [gameId, status];
-
-  const result = await query(sqlQuery, values);
-
-  if (!result || result.rows.length === 0) return null;
-
-  return gameMapper(result.rows[0]);
-}

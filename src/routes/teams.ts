@@ -1,7 +1,21 @@
 import { NextFunction, Request, Response } from 'express';
 import slugify from 'slugify';
-import { getTeams, getTeamBySlug, insertTeam, deleteTeamBySlug, updateTeamBySlug, updateTeamSlugs} from '../lib/db.js';
+import { 
+  getTeams, 
+  getTeamBySlug, 
+  insertTeam, 
+  deleteTeamBySlug, 
+  updateTeamBySlug, 
+  updateTeamSlugs} from '../lib/db.js';
 import { validationResult } from 'express-validator';
+import { 
+  atLeastOneBodyValueValidator, 
+  teamSlugDoesNotExistValidator,
+  teamValidationRules,
+  genericSanitizer,
+  stringValidator,
+  validationCheck,
+  xssSanitizer } from '../lib/validation.js';
 
 (async () => {
   await updateTeamSlugs();
@@ -18,10 +32,8 @@ export async function listTeams(req: Request, res: Response, next: NextFunction)
 
 export async function listTeam(req: Request, res: Response, next: NextFunction) {
   const { slug } = req.params;
-  console.log('Fetching team with slug:', slug); // Debug log
   try {
     const team = await getTeamBySlug(slug);
-    console.log('Fetched team:', team); // Debug log
     if (!team) {
       return res.status(404).json({ message: 'Team not found' });
     }

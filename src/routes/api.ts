@@ -1,5 +1,5 @@
 import express, { Request, Response, NextFunction } from 'express';
-import { listGames, createGame, updateGame, changeGame } from './games.js';
+import { listGames, createGame, updateGame, deleteGame} from './games.js';
 import { listTeams, listTeam, createTeam, deleteTeam, updateTeam } from './teams.js';
 
 export const router = express.Router();
@@ -26,6 +26,7 @@ export async function index(req: Request, res: Response) {
 }
 
 // Teams
+router.get('/', index);
 router.get('/teams', listTeams);
 router.post('/teams', createTeam);
 router.get('/teams/:slug', listTeam);
@@ -35,7 +36,7 @@ router.delete('/teams/:slug', deleteTeam);
 // Games
 router.get('/games', listGames);
 router.post('/games', createGame);
-router.get('/games/:gameId', updateGame); 
 router.patch('/games/:gameId', updateGame); 
-router.put('/games/:gameId', changeGame); 
+router.delete('/games/:gameId', deleteGame);
+
 

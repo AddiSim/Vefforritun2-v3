@@ -1,6 +1,5 @@
 import dotenv from 'dotenv';
 import express, { NextFunction, Request, Response } from 'express';
-import { catchErrors } from './lib/catch-errors.js';
 import { router } from './routes/api.js';
 import { cors } from './lib/cors.js';
 import { testConnection } from './lib/db.js'; // Make sure this path is correct

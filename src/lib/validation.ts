@@ -102,3 +102,32 @@ export const teamSlugDoesNotExistValidator = body('name').custom(async (name) =>
   }
   return true;
 });
+
+export const gameValidationRules = {
+  createOrUpdate: [
+    body('date')
+      .trim()
+      .isISO8601()
+      .withMessage('Invalid date format, should be ISO 8601'),
+    body('homename')
+      .isInt({ min: 1 })
+      .withMessage('Home team ID must be a positive integer'),
+    body('awayname')
+      .isInt({ min: 1 })
+      .withMessage('Away team ID must be a positive integer')
+      .custom((value, { req }) => {
+        if (value === req.body.home) {
+          throw new Error('Home and away teams cannot be the same');
+        }
+        return true;
+      }),
+    body('homescore')
+      .optional()
+      .isInt({ min: 0 })
+      .withMessage('Home score must be a non-negative integer'),
+    body('awayscore')
+      .optional()
+      .isInt({ min: 0 })
+      .withMessage('Away score must be a non-negative integer'),
+  ]
+};

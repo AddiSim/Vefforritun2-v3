@@ -1,0 +1,273 @@
+{
+	"info": {
+		"_postman_id": "fa5dc672-66c7-45fd-88f1-dffcb590635d",
+		"name": "v3",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET /",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /teams — Get all teams",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/teams/",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"teams",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /teams/:slug — Get single team",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/teams/boltalidid",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"teams",
+						"boltalidid"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST /teams — Create team ",
+			"request": {
+				"method": "POST",
+				"header": [
+                    {
+                        "key": "Content-Type",
+            "           value": "application/json"
+                    }
+                ],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"New Team\",\n    \"description\": \"A Description\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/teams",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"teams"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE /teams/:slug - Delete team",
+			"request": {
+				"method": "DELETE",
+				"header": [
+                    {
+                    "key": "Content-Type",
+                    "value": "application/json"}
+                ],
+				"url": {
+					"raw": "{{baseUrl}}/teams/boltalidid",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"teams",
+						"boltalidid"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PATCH /teams/:slug - Update team",
+			"request": {
+				"method": "PATCH",
+				"header": [
+                    {
+                        "key": "Content-Type",
+            "           value": "application/json"
+                    }
+                ],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Updated team name\",\n    \"description\": \"Updated team description\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/teams/boltalidid",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"teams",
+						"boltalidid"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /games",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/games",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"games",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST /games",
+			"request": {
+				"method": "POST",
+				"header": [
+                    {
+                    "key": "Content-Type",
+                    "value": "application/json"}
+                ],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"date\": \"Example: 2024-02-02T15:20:53.955Z\",\n    \"homename\": \"Heiltala\",\n    \"awayname\": \"Heiltala\",\n    \"homescore\": \"heiltala\",\n    \"awayscore\":  \"heiltala\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/games",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"games",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /games/:gameId",
+			"request": {
+				"method": "GET",
+				"header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"}
+                ],
+				"url": {
+					"raw": "{{baseUrl}}/games/1",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"games",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE /games/:courseId",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/games/1",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"games",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+        {
+			"name": "patch /games/:courseId",
+			"request": {
+				"method": "PATCH",
+				"header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"}
+                ],
+                "body": {
+					"mode": "raw",
+					"raw": "{\n    \"date\": \"Example: 2024-02-02T15:20:53.955Z\",\n    \"homename\": \"Heiltala\",\n    \"awayname\": \"Heiltala\",\n    \"homescore\": \"heiltala\",\n    \"awayscore\":  \"heiltala\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/games/1",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"games",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000"
+		}
+	]
+}
