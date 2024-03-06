@@ -7,15 +7,6 @@ import {
   deleteTeamBySlug, 
   updateTeamBySlug, 
   updateTeamSlugs} from '../lib/db.js';
-import { validationResult } from 'express-validator';
-import { 
-  atLeastOneBodyValueValidator, 
-  teamSlugDoesNotExistValidator,
-  teamValidationRules,
-  genericSanitizer,
-  stringValidator,
-  validationCheck,
-  xssSanitizer } from '../lib/validation.js';
 
 (async () => {
   await updateTeamSlugs();
@@ -24,7 +15,7 @@ import {
 export async function listTeams(req: Request, res: Response, next: NextFunction) {
   try {
     const teams = await getTeams();
-    res.json(teams);
+    return res.json(teams);
   } catch (error) {
     next(error);
   }
@@ -35,34 +26,34 @@ export async function listTeam(req: Request, res: Response, next: NextFunction) 
   try {
     const team = await getTeamBySlug(slug);
     if (!team) {
-      return res.status(404).json({ message: 'Team not found' });
+      return next();
     }
-    res.json(team);
+    return res.json(team);
   } catch (error) {
-    console.error('Error fetching team:', error); // Debug log
+    console.error('Error fetching team:', error); 
     next(error);
   }
 }
 
 export async function createTeam(req: Request, res: Response, next: NextFunction) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  const { name, description } = req.body;
-  const slug = slugify(name);
-
   try {
+    const { name, description } = req.body;
+    const slug = slugify(name);
+
     const team = await insertTeam({ name, slug, description });
-    res.status(201).json(team);
-  } catch (error) {
-    if (error === '23505') { // Unique violation
-      return res.status(400).json({ message: 'A team with this name or slug already exists.' });
+    if (!team) {
+      console.log('Failed to create team');
+      return next(new Error('Failed to create team')); // Pass error to Express error handler
     }
-    next(error);
+
+    console.log('Team created successfully', team);
+    return res.status(200).json(team);
+  } catch (error) {
+    console.error('Error in createTeam', error);
+    return next(error); // Pass any caught error to the next error handler
   }
 }
+
 
 export async function deleteTeam(req: Request, res: Response, next: NextFunction) {
   const { slug } = req.params;
@@ -71,31 +62,23 @@ export async function deleteTeam(req: Request, res: Response, next: NextFunction
     if (!success) {
       return res.status(404).json({ message: 'Team not found' });
     }
-    res.status(204).send();
+    return res.status(200).json({ message: 'Team deleted' });
   } catch (error) {
     next(error);
   }
 }
 
 export async function updateTeam(req: Request, res: Response, next: NextFunction) {
-  const { slug } = req.params;
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  const updateData = req.body;
-
   try {
-    const updated = await updateTeamBySlug(slug, updateData);
+    const { slug } = req.params;
+    const updated = await updateTeamBySlug(slug, req.body);
+    
     if (!updated) {
       return res.status(404).json({ message: 'Team not found' });
     }
-    res.json(updated);
+    
+    return res.status(200).json(updated);
   } catch (error) {
     next(error);
   }
 }
-
-
-

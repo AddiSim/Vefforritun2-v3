@@ -86,10 +86,11 @@ export async function insertTeam(team: Omit<team, 'id'>, silent = false): Promis
     [name, slug, description],
     silent,
   );
+  await updateTeamSlugs();
+  const mapped = teamMapper(result?.rows[0]);
 
-  if (!result || result.rows.length === 0) return null;
-
-  return teamMapper(result.rows[0]);
+  return mapped;
+  
 }
 
 export async function insertGame(
@@ -102,6 +103,7 @@ export async function insertGame(
     [date, homename, awayname, homescore, awayscore],
     silent,
   );
+  console.log(result);
     
   return result ? gameMapper(result.rows[0]) : null;
 }
@@ -119,7 +121,7 @@ export async function getTeams(): Promise<Array<team> | null> {
 
 export async function getTeamBySlug(slug: string): Promise<team | null> {
   const queryText = 'SELECT * FROM teams WHERE slug = $1';
-  const values = [slug]; // Ensure this matches the case and format of the slug in the database
+  const values = [slug]; 
   const result = await query(queryText, values);
   if (result && result.rows.length === 0) return null;
   return result ? teamMapper(result.rows[0]) : null;
@@ -128,7 +130,6 @@ export async function getTeamBySlug(slug: string): Promise<team | null> {
 export async function deleteTeamBySlug(slug: string): Promise<boolean> {
   const result = await query('DELETE FROM teams WHERE slug = $1 RETURNING *', [slug]);
 
-  // Explicitly reassure TypeScript about rowCount being a number using a fallback to 0
   return (result?.rowCount ?? 0) > 0;
 }
 
@@ -142,52 +143,45 @@ export async function getGamesByTeamId(id: number): Promise<Array<game>> {
 
 export async function updateTeamBySlug(slug: string, data: Partial<team>): Promise<team | null> {
   const { name, description } = data;
-  const fields = [];
+  const updates = [];
   const values = [];
 
-  if (name !== undefined) {
-    fields.push('name');
+  if (name) {
+    updates.push(`name = $${updates.length + 2}`);
     values.push(name);
   }
-
-  if (description !== undefined) {
-    fields.push('description');
+  if (description) {
+    updates.push(`description = $${updates.length + 2}`);
     values.push(description);
   }
 
-  // Ensure there's something to update
-  if (fields.length === 0) {
+  if (!updates.length) {
     throw new Error('No update fields provided');
   }
 
-  const setClause = fields
-    .map((field, index) => `${field} = $${index + 2}`)
-    .join(', ');
-
-  const query = `
-    UPDATE teams
-    SET ${setClause}
-    WHERE slug = $1
-    RETURNING id, name, slug, description;
-  `;
-
-  values.unshift(slug); // Add slug as the first value
+  const setClause = updates.join(', ');
+  values.unshift(slug); 
 
   try {
     const pool = getPool();
-    const result = await pool.query(query, values);
-    if (result.rows.length === 0) {
-      return null; // No team found with the given slug
-    }
-    return result.rows[0]; // Return the updated team
+    const result = await pool.query(`
+      UPDATE teams
+      SET ${setClause}
+      WHERE slug = $1
+      RETURNING *;
+    `, values);
+
+    if (result.rows.length === 0) return null;
+    return result.rows[0];
   } catch (error) {
     console.error('Failed to update team by slug', error);
-    throw error;
+    throw error; 
   }
 }
 
+
+
 export async function getGames(): Promise<Array<game> | null> {
-  // Adjust the query to join with the teams table twice - once for the home team and once for the away team
   const queryText = `
     SELECT 
       g.id, 
@@ -240,7 +234,7 @@ export async function updateGameByGameId(gameId: number, data: Partial<game>): P
       const pool = getPool();
       const result = await pool.query(queryText, values);
       if (result.rows.length === 0) {
-          return null; // No game found with the given ID
+          return null; 
       }
       return gameMapper(result.rows[0]);
   } catch (error) {

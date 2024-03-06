@@ -1,6 +1,23 @@
-import express, { Request, Response, NextFunction } from 'express';
-import { listGames, createGame, updateGame, deleteGame} from './games.js';
-import { listTeams, listTeam, createTeam, deleteTeam, updateTeam } from './teams.js';
+import express, { Request, Response} from 'express';
+import { 
+    listGames, 
+    createGame, 
+    updateGame, 
+    deleteGame} from './games.js';
+import { 
+    listTeams, 
+    listTeam, 
+    createTeam, 
+    deleteTeam, 
+    updateTeam } from './teams.js';
+    import { 
+        atLeastOneBodyValueValidator, 
+        teamSlugDoesNotExistValidator,
+        teamValidationRules,
+        genericSanitizerMany,
+        stringValidator,
+        validationCheck,
+        xssSanitizer } from '../lib/validation.js';
 
 export const router = express.Router();
 
@@ -20,7 +37,7 @@ export async function index(req: Request, res: Response) {
         },
         {
             href: '/games/:gameId',
-            methods: ['GET', 'PATCH', 'PUT'], 
+            methods: ['PATCH', 'DELETE'], 
         },
     ]);
 }
@@ -28,9 +45,28 @@ export async function index(req: Request, res: Response) {
 // Teams
 router.get('/', index);
 router.get('/teams', listTeams);
-router.post('/teams', createTeam);
+router.post('/teams', 
+    [
+        atLeastOneBodyValueValidator(['name', 'description']),
+        stringValidator({ field: 'name', required: true, maxLength: 50 }),
+        stringValidator({ field: 'description', required: false, maxLength: 255 }), 
+        teamSlugDoesNotExistValidator,
+        xssSanitizer('name'), 
+        xssSanitizer('description'), 
+        validationCheck
+    ], 
+    createTeam);
 router.get('/teams/:slug', listTeam);
-router.patch('/teams/:slug', updateTeam);
+router.patch('/teams/:slug',
+  [
+    stringValidator({ field: 'name', required: false, maxLength: 50, optional: true }),
+    stringValidator({ field: 'description', required: false, maxLength: 255, optional: true }),
+    teamSlugDoesNotExistValidator,
+    xssSanitizer('name'),
+    xssSanitizer('description'),
+    validationCheck,
+  ],
+    updateTeam );
 router.delete('/teams/:slug', deleteTeam);
 
 // Games

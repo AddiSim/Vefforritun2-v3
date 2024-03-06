@@ -9,27 +9,31 @@ export function gameMapper(potentialGame: unknown): game | null {
         date: string,
         homescore: number,
         awayscore: number,
-        hometeamname: string,
-        awayteamname: string
+        homename: number, 
+        awayname: number, 
     } | null;
 
     if (!game || typeof game.id !== 'number' || typeof game.date !== 'string' ||
         typeof game.homescore !== 'number' || typeof game.awayscore !== 'number' ||
-        typeof game.hometeamname !== 'string' || typeof game.awayteamname !== 'string') {
+        typeof game.homename !== 'number' || typeof game.awayname !== 'number') {
+        console.log("Mapping failed due to type mismatch or missing fields", game);
         return null;
     }
 
+    
     const mapped: game = {
         id: game.id,
         date: game.date,
         homescore: game.homescore,
         awayscore: game.awayscore,
-        homename: game.hometeamname,
-        awayname: game.awayteamname,
+        homename: `Team ID: ${game.homename}`, 
+        awayname: `Team ID: ${game.awayname}`, 
     };
 
+    console.log("Mapped game object:", mapped);
     return mapped;
 }
+
 
 
 export function gamesMapper(potentialGames: unknown): Array<game> {
@@ -45,24 +49,24 @@ export function gamesMapper(potentialGames: unknown): Array<game> {
 
 export function teamMapper(potentialTeam: unknown): team | null {
     const team = potentialTeam as {
-        id: number,
+        id?: number,
         name: string,
         slug: string,
         description?: string | null
     } | null;
-
+    console.log(team);
     if (!team || typeof team.id !== 'number' || typeof team.name !== 'string' ||
         typeof team.slug !== 'string'){
         return null;
     }
 
     const mapped: team = {
-        id: team.id,
+        id: team.id ?? undefined,
         name: team.name,
         slug: team.slug,
         description: team.description ?? undefined
     };
-
+    console.log(mapped);
     return mapped;
 }
 

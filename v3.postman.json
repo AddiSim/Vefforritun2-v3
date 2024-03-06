@@ -62,12 +62,7 @@
 			"name": "POST /teams — Create team ",
 			"request": {
 				"method": "POST",
-				"header": [
-                    {
-                        "key": "Content-Type",
-            "           value": "application/json"
-                    }
-                ],
+				"header": [],
 				"body": {
 					"mode": "raw",
 					"raw": "{\n    \"name\": \"New Team\",\n    \"description\": \"A Description\"\n}",
@@ -93,11 +88,7 @@
 			"name": "DELETE /teams/:slug - Delete team",
 			"request": {
 				"method": "DELETE",
-				"header": [
-                    {
-                    "key": "Content-Type",
-                    "value": "application/json"}
-                ],
+				"header": [],
 				"url": {
 					"raw": "{{baseUrl}}/teams/boltalidid",
 					"host": [
@@ -115,12 +106,7 @@
 			"name": "PATCH /teams/:slug - Update team",
 			"request": {
 				"method": "PATCH",
-				"header": [
-                    {
-                        "key": "Content-Type",
-            "           value": "application/json"
-                    }
-                ],
+				"header": [],
 				"body": {
 					"mode": "raw",
 					"raw": "{\n    \"name\": \"Updated team name\",\n    \"description\": \"Updated team description\"\n}",
@@ -165,11 +151,7 @@
 			"name": "POST /games",
 			"request": {
 				"method": "POST",
-				"header": [
-                    {
-                    "key": "Content-Type",
-                    "value": "application/json"}
-                ],
+				"header": [],
 				"body": {
 					"mode": "raw",
 					"raw": "{\n    \"date\": \"Example: 2024-02-02T15:20:53.955Z\",\n    \"homename\": \"Heiltala\",\n    \"awayname\": \"Heiltala\",\n    \"homescore\": \"heiltala\",\n    \"awayscore\":  \"heiltala\"\n}",
@@ -197,9 +179,6 @@
 			"request": {
 				"method": "GET",
 				"header": [
-                    {
-                        "key": "Content-Type",
-                        "value": "application/json"}
                 ],
 				"url": {
 					"raw": "{{baseUrl}}/games/1",
@@ -215,7 +194,7 @@
 			"response": []
 		},
 		{
-			"name": "DELETE /games/:courseId",
+			"name": "DELETE /games/:gameId",
 			"request": {
 				"method": "DELETE",
 				"header": [],
@@ -233,14 +212,10 @@
 			"response": []
 		},
         {
-			"name": "patch /games/:courseId",
+			"name": "patch /games/:gameId",
 			"request": {
 				"method": "PATCH",
-				"header": [
-                    {
-                        "key": "Content-Type",
-                        "value": "application/json"}
-                ],
+				"header": [],
                 "body": {
 					"mode": "raw",
 					"raw": "{\n    \"date\": \"Example: 2024-02-02T15:20:53.955Z\",\n    \"homename\": \"Heiltala\",\n    \"awayname\": \"Heiltala\",\n    \"homescore\": \"heiltala\",\n    \"awayscore\":  \"heiltala\"\n}",
