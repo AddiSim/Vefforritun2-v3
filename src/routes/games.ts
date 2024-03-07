@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 import { 
   getGames, 
-  insertGame, 
-  updateGameByGameId, 
-  deleteGameByGameId } from '../lib/db.js';
+  insertGame,  
+  deleteGameByGameId,
+  getTeamById } from '../lib/db.js';
 
 export async function listGames(req: Request, res: Response, next: NextFunction) {
   try {
@@ -37,15 +37,47 @@ export async function deleteGame(req: Request, res: Response, next: NextFunction
   return res.status(204).json({});
   
 }
+
 export async function updateGame(req: Request, res: Response, next: NextFunction) {
   const gameId = Number(req.params.gameId); 
   if (!gameId) {
-    return next();
+      
+      return res.status(400).send('Invalid game ID.');
   }
-    const updateData = req.body;
-    const updated = await updateGameByGameId(gameId, updateData);
-    if (!updated) {
-      return next(new Error('Unable to update game'));
-    }
-    return res.json(updated);
+
+  try {
+      
+      const updatedGame = await updateGameWithTeamNames(gameId, req.body);
+      
+      
+      if (updatedGame) {
+          return res.status(200).json(updatedGame);
+      } else {
+          
+          return res.status(404).send('Game not found or unable to update.');
+      }
+  } catch (error) {
+      console.error('Error updating game:', error);
+      next(error); 
+  }
+}
+
+export async function updateGameWithTeamNames(gameId: number, updateData: any): Promise<any> {
+  const homeTeamId = updateData.homename;
+  const awayTeamId = updateData.awayname;
+
+  const homeTeam = await getTeamById(homeTeamId);
+  const awayTeam = await getTeamById(awayTeamId);
+
+  
+  if (!homeTeam || !awayTeam) {
+      throw new Error('One or both teams not found');
+  }
+ 
+  return {
+      id: gameId,
+      homename: homeTeam.name, 
+      awayname: awayTeam.name, 
+      ...updateData
+  };
 }

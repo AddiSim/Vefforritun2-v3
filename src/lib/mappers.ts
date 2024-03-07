@@ -9,25 +9,24 @@ export function gameMapper(potentialGame: unknown): game | null {
         date: string,
         homescore: number,
         awayscore: number,
-        homename: number, 
-        awayname: number, 
+        homename: string,  
+        awayname: string,  
     } | null;
 
     if (!game || typeof game.id !== 'number' || typeof game.date !== 'string' ||
         typeof game.homescore !== 'number' || typeof game.awayscore !== 'number' ||
-        typeof game.homename !== 'number' || typeof game.awayname !== 'number') {
+        typeof game.homename !== 'string' || typeof game.awayname !== 'string') {
         console.log("Mapping failed due to type mismatch or missing fields", game);
         return null;
     }
 
-    
     const mapped: game = {
         id: game.id,
         date: game.date,
         homescore: game.homescore,
         awayscore: game.awayscore,
-        homename: `Team ID: ${game.homename}`, 
-        awayname: `Team ID: ${game.awayname}`, 
+        homename: game.homename,
+        awayname: game.awayname,
     };
 
     console.log("Mapped game object:", mapped);

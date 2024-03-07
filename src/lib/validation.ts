@@ -95,12 +95,12 @@ export const teamValidationRules = {
   ],
 };
 
-export const teamSlugDoesNotExistValidator = body('name').custom(async (name) => {
+export const teamSlugDoesNotExistValidator = body('name').custom(async (name, { req }) => {
   const slug = slugify(name);
-  if (await getTeamBySlug(slug)) {
+  const teamExists = await getTeamBySlug(slug);
+  if (teamExists) {
     throw new Error('Team with this name already exists');
   }
-  return true;
 });
 
 export const gameValidationRules = {
@@ -131,3 +131,30 @@ export const gameValidationRules = {
       .withMessage('Away score must be a non-negative integer'),
   ]
 };
+
+export const createTeamValidations = [
+  body('name').trim().notEmpty().withMessage('Name is required'),
+  ...teamValidationRules.createOrUpdate,
+  teamSlugDoesNotExistValidator,
+  xssSanitizerMany(['name', 'description']),
+  validationCheck,
+];
+
+export const updateTeamValidations = [
+  body('name').optional().trim().notEmpty().withMessage('Name cannot be empty'),
+  ...teamValidationRules.createOrUpdate,
+  teamSlugDoesNotExistValidator,
+  xssSanitizerMany(['name', 'description']),
+  validationCheck,
+];
+
+export const createGameValidations = [
+  ...gameValidationRules.createOrUpdate, 
+  validationCheck 
+];
+
+
+export const updateGameValidations = [
+  ...gameValidationRules.createOrUpdate, 
+  validationCheck 
+];

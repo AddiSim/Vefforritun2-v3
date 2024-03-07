@@ -243,3 +243,12 @@ export async function updateGameByGameId(gameId: number, data: Partial<game>): P
   }
 }
 
+export async function getTeamById(teamId: number): Promise<team | null> {
+  const result = await query('SELECT name FROM teams WHERE id = $1', [teamId]);
+  if (result && result.rows.length > 0) {
+    return result.rows[0]; 
+  } else {
+    return null;
+  }
+}
+

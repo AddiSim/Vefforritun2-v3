@@ -8,13 +8,6 @@ dotenv.config();
 
 const app = express();
 
-// Test Route for Debugging
-app.get('/debug', (req, res) => {
-  console.log('Debug route hit, sending response...');
-  res.status(200).json({ message: 'Debug route works!' });
-});
-
-// Middleware to log all incoming requests
 app.use((req, res, next) => {
   console.log(`Received ${req.method} request on ${req.path}`);
   next();
@@ -40,13 +33,13 @@ async function startApp() {
   }
 }
 
-// Catch-all 404 handler with additional logging
+
 app.use((req: Request, res: Response) => {
   console.log(`No route matched. Sending 404 for request: ${req.method} ${req.originalUrl}`);
   res.status(404).json({ error: 'not found' });
 });
 
-// Enhanced error handler with logging
+
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(`Error handling ${req.method} request to ${req.originalUrl}:`, err);
   if (!res.headersSent) {

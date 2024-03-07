@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import slugify from 'slugify';
+import { body } from 'express-validator';
 import { 
   getTeams, 
   getTeamBySlug, 
@@ -7,7 +8,12 @@ import {
   deleteTeamBySlug, 
   updateTeamBySlug, 
   updateTeamSlugs} from '../lib/db.js';
-
+  import {
+    teamValidationRules,
+    validationCheck,
+    teamSlugDoesNotExistValidator,
+    xssSanitizerMany,
+  } from '../lib/validation.js';
 (async () => {
   await updateTeamSlugs();
 })();
@@ -43,14 +49,14 @@ export async function createTeam(req: Request, res: Response, next: NextFunction
     const team = await insertTeam({ name, slug, description });
     if (!team) {
       console.log('Failed to create team');
-      return next(new Error('Failed to create team')); // Pass error to Express error handler
+      return next(new Error('Failed to create team')); 
     }
 
     console.log('Team created successfully', team);
     return res.status(200).json(team);
   } catch (error) {
     console.error('Error in createTeam', error);
-    return next(error); // Pass any caught error to the next error handler
+    return next(error); 
   }
 }
 
